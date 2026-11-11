@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block title %}File Incident Report - FR-02{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-danger text-white py-3">
+                <h5 class="mb-0"><i class="fa-solid fa-file-pen me-2"></i>Submit Fake Profile or Identity Misuse Report (FR-02)</h5>
+                <small class="text-white-50">Incident Classification & Detailed Narrative Submission</small>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Reporter Name *</label>
+                            {{ form.reporter_name }}
+                            {% if form.reporter_name.errors %}<div class="text-danger small">{{ form.reporter_name.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Reporter Email *</label>
+                            {{ form.reporter_email }}
+                            {% if form.reporter_email.errors %}<div class="text-danger small">{{ form.reporter_email.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Incident Classification *</label>
+                            {{ form.incident_type }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Date When Incident Was Noticed *</label>
+                            {{ form.date_noticed }}
+                            {% if form.date_noticed.errors %}<div class="text-danger small">{{ form.date_noticed.errors.0 }}</div>{% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Case Title / Incident Headline *</label>
+                        {{ form.title }}
+                        {% if form.title.errors %}<div class="text-danger small">{{ form.title.errors.0 }}</div>{% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Incident Narrative Description *</label>
+                        {{ form.incident_description }}
+                        {% if form.incident_description.errors %}
+                            <div class="text-danger small fw-bold mt-1">{{ form.incident_description.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">Provide exact details on how identity attributes or photos were stolen (Minimum 30 characters).</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Impact Summary (Optional)</label>
+                        {{ form.impact_summary }}
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'incident_list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-danger px-4 fw-semibold">
+                            <i class="fa-solid fa-paper-plane me-1"></i> Submit Incident Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
