@@ -1,0 +1,33 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+**/__pycache__/
+*.py[cod]
+*$py.class
+
+# SQLite database (to prevent team merge conflicts)
+*.sqlite3
+**/*.sqlite3
+db.sqlite3
+**/db.sqlite3
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+**/venv/
+**/.venv/
+
+# VS Code and editor files
+.vscode/
+**/.vscode/
+.idea/
+
+# Media and user uploads
+media/
+**/media/
+!**/media/.gitkeep
+
+# OS generated files
+.DS_Store
+Thumbs.db

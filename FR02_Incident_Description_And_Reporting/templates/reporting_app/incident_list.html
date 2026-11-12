@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Case Tracking {% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1"><i class="fa-solid fa-folder-open text-danger me-2"></i>Reported Cases</h4>
+        <p class="text-muted mb-0">List of all submitted identity misuse and fake profile incidents.</p>
+    </div>
+    <a href="{% url 'submit_incident' %}" class="btn btn-danger">
+        <i class="fa-solid fa-plus me-1"></i> File New Incident
+    </a>
+</div>
+
+{% if incidents %}
+    <div class="row">
+        {% for item in incidents %}
+        <div class="col-md-6 mb-4">
+            <div class="card h-100 shadow-sm border-0 border-top border-4 border-danger">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <span class="badge bg-secondary font-monospace">{{ item.case_id }}</span>
+                        <span class="badge bg-info text-dark">{{ item.get_status_display }}</span>
+                    </div>
+                    <h5 class="fw-bold">{{ item.title }}</h5>
+                    <div class="text-muted small mb-2">
+                        <strong>Type:</strong> {{ item.get_incident_type_display }} &bull; 
+                        <strong>Date:</strong> {{ item.date_noticed }}
+                    </div>
+                    <p class="text-secondary small" style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                        {{ item.incident_description }}
+                    </p>
+                </div>
+                <div class="card-footer bg-white border-0 pt-0 pb-3">
+                    <a href="{% url 'incident_detail' case_id=item.case_id %}" class="btn btn-outline-danger btn-sm w-100">
+                        View Full Narrative &rarr;
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card text-center p-5 shadow-sm">
+        <h5 class="text-muted">No incidents filed yet.</h5>
+        <p class="small text-muted">Click below to submit your first incident report.</p>
+        <a href="{% url 'submit_incident' %}" class="btn btn-danger btn-sm mx-auto">File Incident</a>
+    </div>
+{% endif %}
+{% endblock %}
+
