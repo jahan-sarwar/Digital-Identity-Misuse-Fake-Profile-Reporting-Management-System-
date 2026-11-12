@@ -1,0 +1,26 @@
+# Django Database (Crucial: prevents database conflicts between teammates)
+*.sqlite3
+db.sqlite3
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# User uploaded media files
+/media/avatars/*
+!/media/avatars/.gitkeep
+
+# IDE and Editor configurations
+.vscode/
+.history/
+.idea/
+
+# Environment variables
+.env
