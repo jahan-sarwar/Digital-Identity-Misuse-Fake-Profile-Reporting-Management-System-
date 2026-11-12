@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Sign In{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 mt-3">
+            <div class="card-header bg-dark text-white text-center py-3">
+                <i class="fa-solid fa-lock text-info fa-2x mb-2"></i>
+                <h5 class="mb-0">User Login</h5>
+                <small class="text-white-50">Secure Credential Authentication</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Username or Email</label>
+                        {{ form.username }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Password</label>
+                        {{ form.password }}
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">
+                        <i class="fa-solid fa-right-to-bracket me-1"></i> Sign In
+                    </button>
+                </form>
+                <div class="text-center mt-3 small">
+                    Don't have an account? <a href="{% url 'signup' %}">Create account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
