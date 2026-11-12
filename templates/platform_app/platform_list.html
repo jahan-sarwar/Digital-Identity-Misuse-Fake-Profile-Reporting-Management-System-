@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% block title %}Platform Reports List{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold mb-1"><i class="fa-solid fa-list-check text-primary me-2"></i>Reported Profile Links</h4>
+        <p class="text-muted mb-0">Overview of recorded platform URLs and account handles.</p>
+    </div>
+    <a href="{% url 'submit_platform_url' %}" class="btn btn-primary">
+        <i class="fa-solid fa-plus me-1"></i> Submit Profile Link
+    </a>
+</div>
+
+{% if reports %}
+    <div class="card shadow-sm border-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Case ID</th>
+                        <th>Reporter</th>
+                        <th>Platform</th>
+                        <th>Target Profile URL</th>
+                        <th>Handle</th>
+                        <th>Date</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in reports %}
+                    <tr>
+                        <td><span class="badge bg-secondary font-monospace">{{ item.case_id }}</span></td>
+                        <td>{{ item.reporter_name }}</td>
+                        <td><span class="badge bg-primary">{{ item.get_platform_display }}</span></td>
+                        <td class="text-break" style="max-width: 250px;">
+                            <a href="{{ item.target_profile_url }}" target="_blank" rel="noopener noreferrer" class="text-decoration-none">
+                                {{ item.target_profile_url }} <i class="fa-solid fa-arrow-up-right-from-square small"></i>
+                            </a>
+                        </td>
+                        <td>{{ item.target_username_or_handle|default:"-" }}</td>
+                        <td>{{ item.created_at|date:"M d, Y" }}</td>
+                        <td>
+                            <a href="{% url 'platform_case_detail' case_id=item.case_id %}" class="btn btn-outline-primary btn-sm">
+                                View &rarr;
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% else %}
+    <div class="card text-center p-5 shadow-sm">
+        <h5 class="text-muted">No profile URLs submitted yet.</h5>
+        <a href="{% url 'submit_platform_url' %}" class="btn btn-primary btn-sm mx-auto mt-2">Submit Profile Link</a>
+    </div>
+{% endif %}
+{% endblock %}
+

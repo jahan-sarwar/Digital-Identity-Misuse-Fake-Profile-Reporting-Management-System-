@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Submit Platform Profile URL{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white py-3">
+                <h5 class="mb-0"><i class="fa-solid fa-globe me-2"></i>Select Social Media & Submit Profile URL</h5>
+                <small class="text-white-50">Cross-Field Platform & Domain Whitelist Validation</small>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="POST" novalidate>
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Reporter Name *</label>
+                        {{ form.reporter_name }}
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Social Media / Platform *</label>
+                            {{ form.platform }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Platform Name (if 'Other')</label>
+                            {{ form.other_platform_name }}
+                            {% if form.other_platform_name.errors %}
+                                <div class="text-danger small">{{ form.other_platform_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Reported Target Profile / Post URL *</label>
+                        {{ form.target_profile_url }}
+                        {% if form.target_profile_url.errors %}
+                            <div class="text-danger small fw-bold mt-1">{{ form.target_profile_url.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">Must be a valid URL matching the selected platform's official domain.</div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Account Handle or Username (Optional)</label>
+                        {{ form.target_username_or_handle }}
+                        <div class="form-text">e.g., @fake_sarwar or username</div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'platform_list' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary px-4 fw-semibold">
+                            <i class="fa-solid fa-check-double me-1"></i> Verify & Submit URL
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
