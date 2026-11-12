@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block title %}Upload Supporting Evidence {% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-secondary text-white py-3">
+                <h5 class="mb-0"><i class="fa-solid fa-cloud-arrow-up me-2"></i>Upload Supporting Evidence </h5>
+                <small class="text-white-50">Strict 5MB Size Cap & Extension Filter (.jpg, .jpeg, .png, .pdf)</small>
+            </div>
+            <div class="card-body p-4 p-md-5">
+                <form method="POST" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Case Tracking ID *</label>
+                            {{ form.case_id }}
+                            <div class="form-text">e.g., DIM-2026-A1B2C3D4</div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label fw-semibold">Reporter Name *</label>
+                            {{ form.uploader_name }}
+                        </div>
+                    </div>
+
+                    <div class="card bg-light border p-3 mb-3">
+                        <h6 class="fw-bold mb-2"><i class="fa-solid fa-image text-primary me-2"></i>Primary Evidence File *</h6>
+                        <div class="row g-2">
+                            <div class="col-md-7">
+                                {{ form.primary_evidence }}
+                                {% if form.primary_evidence.errors %}
+                                    <div class="text-danger small fw-bold mt-1">{{ form.primary_evidence.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-5">
+                                {{ form.primary_caption }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card bg-light border p-3 mb-4">
+                        <h6 class="fw-bold mb-2"><i class="fa-solid fa-file-pdf text-danger me-2"></i>Secondary Evidence File (Optional)</h6>
+                        <div class="row g-2">
+                            <div class="col-md-7">
+                                {{ form.secondary_evidence }}
+                                {% if form.secondary_evidence.errors %}
+                                    <div class="text-danger small fw-bold mt-1">{{ form.secondary_evidence.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-5">
+                                {{ form.secondary_caption }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'evidence_gallery' %}" class="btn btn-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-warning px-4 fw-semibold text-dark">
+                            <i class="fa-solid fa-upload me-1"></i> Upload Evidence
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
