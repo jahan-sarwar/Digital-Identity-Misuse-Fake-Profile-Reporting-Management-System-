@@ -1,52 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}User Registration & Authentication{% endblock %} | SE331</title>
+    <title>{% block title %}User Registration & Authentication{% endblock %} | Management System</title>
+    <!-- Bootstrap 5 CSS & FontAwesome Icons / ফ্রন্টএন্ড স্টাইলিং ও আইকন -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
-
 <body class="bg-light d-flex flex-column min-vh-100">
+    <!-- Top Navigation Bar / মূল নেভিগেশন বার -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container">
-            <a class="navbar-brand fw-bold text-info" href="{% url 'profile' %}">
+            <a class="navbar-brand fw-bold text-info" href="{% if user.is_staff or user.is_superuser %}{% url 'admin_portal' %}{% elif user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'login' %}{% endif %}">
                 <i class="fa-solid fa-user-shield me-2"></i>User Authentication System
             </a>
-            <div class="navbar-nav ms-auto">
+            <div class="navbar-nav ms-auto align-items-center">
                 {% if user.is_authenticated %}
-
-                <span class="nav-item nav-link text-white-50 me-2"><i class="fa-solid fa-user me-1"></i>{{ user.username
-                    }}</span>
-                <a class="nav-link text-white" href="{% url 'profile' %}">My Profile</a>
-                <a class="btn btn-outline-danger btn-sm ms-2" href="{% url 'logout' %}">Sign Out</a>
+                    {% if user.is_staff or user.is_superuser %}
+                    <a class="btn btn-warning btn-sm fw-bold me-2" href="{% url 'admin_portal' %}">
+                        <i class="fa-solid fa-shield-halved me-1"></i>Admin Portal
+                    </a>
+                    {% endif %}
+                    <a class="btn btn-outline-info btn-sm me-3" href="{% url 'submit_case' %}">
+                        <i class="fa-solid fa-plus-circle me-1"></i>Submit Case
+                    </a>
+                    <span class="nav-item text-white-50 me-2"><i class="fa-solid fa-user me-1"></i>{{ user.username }}</span>
+                    <a class="nav-link text-white me-2" href="{% url 'profile' %}">Profile</a>
+                    <a class="btn btn-outline-danger btn-sm" href="{% url 'logout' %}">Sign Out</a>
                 {% else %}
-                <a class="nav-link text-white me-2" href="{% url 'login' %}">Sign In</a>
-                <a class="btn btn-primary btn-sm" href="{% url 'signup' %}">Sign Up</a>
+                    <a class="nav-link text-white me-2" href="{% url 'login' %}">Sign In</a>
+                    <a class="btn btn-primary btn-sm" href="{% url 'signup' %}">Sign Up</a>
                 {% endif %}
             </div>
         </div>
     </nav>
 
+    <!-- Main Content Area / মূল কনটেন্ট এরিয়া -->
     <div class="container my-4 flex-grow-1">
         {% if messages %}
-        {% for message in messages %}
-        <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
-            {{ message }}
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-        </div>
-        {% endfor %}
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show shadow-sm" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
         {% endif %}
         {% block content %}{% endblock %}
     </div>
 
+    <!-- Page Footer / ফুটার -->
     <footer class="bg-white border-top py-3 text-center text-muted small">
-        User Registration & Account Management
+        User Registration & Administrative Management System
     </footer>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
