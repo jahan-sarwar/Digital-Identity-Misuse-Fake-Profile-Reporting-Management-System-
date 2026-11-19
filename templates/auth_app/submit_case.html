@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% block title %}Submit Fake Profile Complaint{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-7">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3 border-bottom">
+                <h5 class="mb-0 fw-bold text-dark">
+                    <i class="fa-solid fa-flag text-danger me-2"></i>Report Fake Profile & Identity Misuse
+                </h5>
+                <p class="small text-muted mb-0">
+                    Submit incident details for administrative review and case acceptance.
+                    (আপনার পরিচয় অপব্যবহার বা ফেক প্রোফাইলের তথ্য দাখিল করুন)
+                </p>
+            </div>
+            <div class="card-body p-4">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Social Media / Platform Name (প্ল্যাটফর্মের নাম):</label>
+                        <select name="platform" class="form-select" required>
+                            <option value="Facebook">Facebook</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="LinkedIn">LinkedIn</option>
+                            <option value="X (Twitter)">X (Twitter)</option>
+                            <option value="TikTok">TikTok</option>
+                            <option value="Other Platform">Other Platform</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Impersonating / Fake Profile URL (ভুয়া প্রোফাইলের লিঙ্ক):</label>
+                        <input type="url" name="fake_profile_url" class="form-control" placeholder="https://facebook.com/fake.profile.101" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Incident Description (ঘটনার বিবরণ):</label>
+                        <textarea name="incident_description" rows="4" class="form-control" placeholder="Describe how your photos, name, or identity are being misused..." required></textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-semibold">Supporting Evidence Details (প্রমাণের বর্ণনা / ফাইল রেফারেন্স):</label>
+                        <textarea name="evidence_notes" rows="2" class="form-control" placeholder="e.g. Screenshot taken on 18 Nov, malicious messages sent to friends, etc."></textarea>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-arrow-left me-1"></i>Back to Profile
+                        </a>
+                        <button type="submit" class="btn btn-danger fw-bold px-4">
+                            <i class="fa-solid fa-paper-plane me-1"></i>Submit Complaint (দাখিল করুন)
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
