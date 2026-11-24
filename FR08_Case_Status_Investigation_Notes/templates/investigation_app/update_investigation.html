@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+<!-- Investigation Workspace: Status Controls & Chronological Forensic Journal -->
+
+{% block title %}Investigation Journal: {{ case.case_id }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Column: Case Information & Status Update Form -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 mb-4 border-top border-primary border-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-dark">
+                    <i class="fa-solid fa-sliders text-primary me-2"></i>Investigation Status & Leads
+                </h5>
+                <small class="text-muted">Case ID: <strong class="text-primary">{{ case.case_id }}</strong> &bull; Lead: {{ case.investigating_officer }}</small>
+            </div>
+            <div class="card-body p-4">
+                <div class="mb-3">
+                    <label class="text-muted small d-block">Complainant / Victim:</label>
+                    <strong class="fs-6 text-dark">{{ case.victim_name }}</strong>
+                </div>
+                <div class="mb-4">
+                    <label class="text-muted small d-block">Incident Subject:</label>
+                    <div class="fw-semibold text-secondary">{{ case.case_title }}</div>
+                </div>
+
+                <!-- Form: Update Status and Leads -->
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action_type" value="UPDATE_STATUS">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Current Milestone Status <span class="text-danger">*</span></label>
+                        {{ status_form.current_status }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Digital Forensic Leads & IP Registry</label>
+                        {{ status_form.suspect_lead_info }}
+                        <small class="text-muted">Document offender ISP, device fingerprints, or known contact proxies.</small>
+                    </div>
+
+                    <div class="mb-3 form-check form-switch">
+                        {{ status_form.platform_takedown_requested }}
+                        <label class="form-check-label fw-bold" for="{{ status_form.platform_takedown_requested.id_for_label }}">
+                            Platform Legal Takedown Issued
+                        </label>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Platform Escalation Ticket Reference</label>
+                        {{ status_form.platform_ticket_id }}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary fw-bold">
+                            <i class="fa-solid fa-arrows-rotate me-2"></i> Update Investigation Status
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <a href="{% url 'case_journal_list' %}" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i> Return to Case List
+        </a>
+    </div>
+
+    <!-- Right Column: Forensic Investigation Journal Log & Append Form -->
+    <div class="col-lg-7">
+        <!-- New Note Appending Card -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-dark text-white py-3">
+                <h6 class="mb-0 fw-bold">
+                    <i class="fa-solid fa-pen-nib text-info me-2"></i>Log New Forensic Entry to Journal
+                </h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action_type" value="ADD_NOTE">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Investigator Name</label>
+                            {{ note_form.officer_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Log Classification Type</label>
+                            {{ note_form.note_type }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Detailed Observations & Findings</label>
+                            {{ note_form.detailed_notes }}
+                        </div>
+                        <div class="col-12 form-check">
+                            {{ note_form.is_confidential }}
+                            <label class="form-check-label fw-semibold text-danger small">
+                                <i class="fa-solid fa-lock me-1"></i> Mark as Confidential (Restricted Internal Access)
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-3">
+                        <button type="submit" class="btn btn-dark fw-bold">
+                            <i class="fa-solid fa-plus me-1"></i> Append to Case Journal
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Chronological Journal Timeline -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold text-dark">
+                    <i class="fa-solid fa-timeline text-primary me-2"></i>Investigation Activity Timeline
+                </h6>
+            </div>
+            <div class="card-body p-4">
+                {% for n in notes %}
+                    <div class="border-start border-3 border-primary ps-3 pb-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong class="text-dark">{{ n.officer_name }}</strong>
+                            <small class="text-muted">{{ n.created_at|date:"M d, Y - h:i A" }}</small>
+                        </div>
+                        <div class="mb-2">
+                            <span class="badge bg-secondary">{{ n.get_note_type_display }}</span>
+                            {% if n.is_confidential %}
+                                <span class="badge bg-danger"><i class="fa-solid fa-lock me-1"></i> Confidential</span>
+                            {% endif %}
+                        </div>
+                        <p class="mb-0 text-secondary bg-light p-3 rounded small">{{ n.detailed_notes }}</p>
+                    </div>
+                {% empty %}
+                    <div class="text-center text-muted py-4">No investigative entries recorded yet.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
