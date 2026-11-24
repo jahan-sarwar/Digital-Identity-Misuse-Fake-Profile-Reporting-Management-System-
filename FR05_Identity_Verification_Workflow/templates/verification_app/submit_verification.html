@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+<!-- Complainant Identity Verification Submission Template -->
+
+{% block title %}Submit Complainant Identity Verification{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <!-- Main submission card -->
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="mb-0 fw-semibold">
+                    <i class="fa-solid fa-user-check me-2"></i>Complainant Identity Verification Portal
+                </h4>
+                <small class="text-white-50">Authenticate your identity to expedite administrative review and legal case escalation.</small>
+            </div>
+            <div class="card-body p-4">
+                <div class="alert alert-info border-0 shadow-sm d-flex align-items-center mb-4">
+                    <i class="fa-solid fa-shield-halved fs-3 me-3 text-primary"></i>
+                    <div>
+                        <strong>Confidentiality Notice:</strong> All submitted identification documents and selfie credentials are encrypted and strictly reviewed by authorized cyber verification officers.
+                    </div>
+                </div>
+
+                <!-- Form submission post handler -->
+                <form method="POST" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+                    
+                    <div class="row g-3">
+                        <!-- Case Reference ID -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Case Reference ID <span class="text-danger">*</span></label>
+                            {{ form.case_id }}
+                            {% if form.case_id.errors %}
+                                <div class="text-danger small mt-1">{{ form.case_id.errors.0 }}</div>
+                            {% endif %}
+                            <small class="text-muted">Enter the Case ID you received upon filing your incident report.</small>
+                        </div>
+
+                        <!-- Full Legal Name -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Full Legal Name <span class="text-danger">*</span></label>
+                            {{ form.reporter_full_name }}
+                            {% if form.reporter_full_name.errors %}
+                                <div class="text-danger small mt-1">{{ form.reporter_full_name.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Official Email Address -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Contact Email Address <span class="text-danger">*</span></label>
+                            {{ form.reporter_email }}
+                            {% if form.reporter_email.errors %}
+                                <div class="text-danger small mt-1">{{ form.reporter_email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Phone Number -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Contact Phone / Mobile</label>
+                            {{ form.reporter_phone }}
+                            {% if form.reporter_phone.errors %}
+                                <div class="text-danger small mt-1">{{ form.reporter_phone.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Document Type Selection -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Identity Document Type <span class="text-danger">*</span></label>
+                            {{ form.document_type }}
+                            {% if form.document_type.errors %}
+                                <div class="text-danger small mt-1">{{ form.document_type.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Document Registration Number -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Document Serial / NID Number <span class="text-danger">*</span></label>
+                            {{ form.id_number }}
+                            {% if form.id_number.errors %}
+                                <div class="text-danger small mt-1">{{ form.id_number.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Scanned ID Upload -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fa-solid fa-file-arrow-up me-1 text-primary"></i> Upload Official ID Document <span class="text-danger">*</span>
+                            </label>
+                            {{ form.document_file }}
+                            {% if form.document_file.errors %}
+                                <div class="text-danger small mt-1">{{ form.document_file.errors.0 }}</div>
+                            {% endif %}
+                            <small class="text-muted">Allowed: JPG, PNG, PDF (Max 5MB)</small>
+                        </div>
+
+                        <!-- Live Selfie Upload -->
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">
+                                <i class="fa-solid fa-camera me-1 text-primary"></i> Upload Live Verification Selfie <span class="text-danger">*</span>
+                            </label>
+                            {{ form.selfie_photo }}
+                            {% if form.selfie_photo.errors %}
+                                <div class="text-danger small mt-1">{{ form.selfie_photo.errors.0 }}</div>
+                            {% endif %}
+                            <small class="text-muted">Clear photo of your face holding a paper with your Case ID.</small>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Submit action button -->
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg fw-bold">
+                            <i class="fa-solid fa-paper-plane me-2"></i> Submit Verification Documents
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+<!-- Verification Status Display Template -->
+
+{% block title %}Verification Status: {{ record.case_id }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fa-solid fa-file-contract text-info me-2"></i>Identity Verification Record
+                    </h5>
+                    <small class="text-white-50">Case Reference: {{ record.case_id }}</small>
+                </div>
+                <!-- Dynamic Status Badge -->
+                <div>
+                    {% if record.verification_status == 'VERIFIED' %}
+                        <span class="badge bg-success fs-6"><i class="fa-solid fa-check-circle me-1"></i> Verified</span>
+                    {% elif record.verification_status == 'PENDING' %}
+                        <span class="badge bg-warning text-dark fs-6"><i class="fa-solid fa-clock me-1"></i> Under Review</span>
+                    {% elif record.verification_status == 'UNDER_REVIEW' %}
+                        <span class="badge bg-info text-dark fs-6"><i class="fa-solid fa-magnifying-glass me-1"></i> In Inspection</span>
+                    {% else %}
+                        <span class="badge bg-danger fs-6"><i class="fa-solid fa-xmark me-1"></i> Discrepancy / Rejected</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="card-body p-4">
+                <!-- Summary verification receipt -->
+                <div class="row mb-4">
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted d-block small">Complainant Full Name:</span>
+                        <strong class="fs-5">{{ record.reporter_full_name }}</strong>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted d-block small">Contact Email:</span>
+                        <span>{{ record.reporter_email }}</span>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted d-block small">ID Document Type:</span>
+                        <span class="badge bg-secondary">{{ record.get_document_type_display }}</span>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted d-block small">Document Serial Number:</span>
+                        <code>{{ record.id_number }}</code>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted d-block small">Submission Timestamp:</span>
+                        <span>{{ record.submitted_at|date:"M d, Y - h:i A" }}</span>
+                    </div>
+                    <div class="col-sm-6 mb-3">
+                        <span class="text-muted d-block small">Security Verification Token:</span>
+                        <code class="small text-primary">{{ record.verification_token }}</code>
+                    </div>
+                </div>
+
+                <!-- Administrative notes or rejection alert -->
+                {% if record.admin_notes %}
+                    <div class="alert alert-light border p-3 mb-4">
+                        <h6 class="fw-bold mb-1"><i class="fa-solid fa-clipboard-check text-success me-1"></i> Officer Inspection Note:</h6>
+                        <p class="mb-0 text-secondary">{{ record.admin_notes }}</p>
+                    </div>
+                {% endif %}
+
+                {% if record.rejection_reason %}
+                    <div class="alert alert-danger p-3 mb-4">
+                        <h6 class="fw-bold mb-1"><i class="fa-solid fa-triangle-exclamation me-1"></i> Rejection Reason:</h6>
+                        <p class="mb-0">{{ record.rejection_reason }}</p>
+                    </div>
+                {% endif %}
+
+                <div class="d-flex justify-content-between align-items-center mt-3 pt-3 border-top">
+                    <a href="{% url 'submit_verification' %}" class="btn btn-outline-secondary">
+                        <i class="fa-solid fa-arrow-left me-1"></i> Submit Another Verification
+                    </a>
+                    <a href="{% url 'verification_review_portal' %}" class="btn btn-warning">
+                        <i class="fa-solid fa-shield-halved me-1"></i> Open Officer Review Console
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
