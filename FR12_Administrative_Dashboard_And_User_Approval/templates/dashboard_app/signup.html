@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+<!-- User Registration Form Requiring Administrative Approval -->
+
+{% block title %}Register New System Account{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0 border-top border-info border-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-dark">
+                    <i class="fa-solid fa-user-plus text-info me-2"></i>Create System Account
+                </h5>
+                <small class="text-muted">All new accounts require Security Administrator approval prior to first login.</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger small">{{ form.non_field_errors.0 }}</div>
+                    {% endif %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Username <span class="text-danger">*</span></label>
+                            {{ form.username }}
+                            {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Full Legal Name <span class="text-danger">*</span></label>
+                            {{ form.full_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Email Address <span class="text-danger">*</span></label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Phone Number</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Requested Role <span class="text-danger">*</span></label>
+                            {{ form.assigned_role }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Department / Affiliation</label>
+                            {{ form.department }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Password <span class="text-danger">*</span></label>
+                            {{ form.password }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Confirm Password <span class="text-danger">*</span></label>
+                            {{ form.confirm_password }}
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 mt-4">
+                        <button type="submit" class="btn btn-info text-dark fw-bold py-2">
+                            <i class="fa-solid fa-paper-plane me-2"></i> Submit Registration for Admin Approval
+                        </button>
+                    </div>
+                </form>
+                <div class="text-center mt-3 small">
+                    Already approved? <a href="{% url 'user_login' %}" class="fw-bold text-primary">Proceed to Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

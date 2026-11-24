@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+<!-- System Login Form Enforcing Administrative Approval -->
+
+{% block title %}System Account Login{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 border-top border-primary border-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-dark">
+                    <i class="fa-solid fa-right-to-bracket text-primary me-2"></i>Authorized Portal Login
+                </h5>
+                <small class="text-muted">Access is restricted to accounts approved by the Security Administrator.</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Username or Email <span class="text-danger">*</span></label>
+                        {{ form.username }}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Password <span class="text-danger">*</span></label>
+                        {{ form.password }}
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary fw-bold py-2">
+                            <i class="fa-solid fa-lock-open me-2"></i> Sign In
+                        </button>
+                    </div>
+                </form>
+
+                <div class="alert alert-light border mt-4 small mb-0">
+                    <strong>Demo Credentials:</strong><br>
+                    Admin (Approved): <code>admin.sarwar</code> / <code>Admin@1234</code><br>
+                    Officer (Pending): <code>officer.ariful</code> / <code>Officer@1234</code>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
