@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+<!-- Case Event Notification Center & In-App Alerts Inbox -->
+
+{% block title %}Case Alerts Inbox{% endblock %}
+
+{% block content %}
+<!-- Metric Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 bg-primary text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-white-50 small">Total Notifications Generated</span>
+                    <h3 class="fw-bold mb-0">{{ total_count }}</h3>
+                </div>
+                <i class="fa-solid fa-envelopes-bulk fs-1 text-white-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 bg-warning text-dark p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-dark small">Unread Alerts Pending</span>
+                    <h3 class="fw-bold mb-0">{{ unread_count }}</h3>
+                </div>
+                <i class="fa-solid fa-bell fs-1 text-black-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card shadow-sm border-0 bg-success text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-white-50 small">Carrier Delivered Acknowledgments</span>
+                    <h3 class="fw-bold mb-0">{{ delivered_count }}</h3>
+                </div>
+                <i class="fa-solid fa-circle-check fs-1 text-white-50"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Notification Feed & Filter Card -->
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+        <h5 class="mb-0 fw-bold text-dark">
+            <i class="fa-solid fa-list-check text-primary me-2"></i>Automated Dispatch Activity Feed
+        </h5>
+        <!-- Filter Channels -->
+        <div class="btn-group btn-group-sm">
+            <a href="{% url 'notification_inbox' %}" class="btn btn-outline-secondary {% if selected_channel == 'ALL' and not unread_only %}active{% endif %}">All Channels</a>
+            <a href="{% url 'notification_inbox' %}?channel=EMAIL" class="btn btn-outline-primary {% if selected_channel == 'EMAIL' %}active{% endif %}"><i class="fa-solid fa-envelope me-1"></i> Email</a>
+            <a href="{% url 'notification_inbox' %}?channel=SMS" class="btn btn-outline-info {% if selected_channel == 'SMS' %}active{% endif %}"><i class="fa-solid fa-comment-sms me-1"></i> SMS</a>
+            <a href="{% url 'notification_inbox' %}?channel=IN_APP" class="btn btn-outline-warning {% if selected_channel == 'IN_APP' %}active{% endif %}"><i class="fa-solid fa-bell me-1"></i> In-App</a>
+            <a href="{% url 'notification_inbox' %}?unread=1" class="btn btn-outline-danger {% if unread_only %}active{% endif %}">Unread Only</a>
+        </div>
+    </div>
+
+    <div class="card-body p-0">
+        <div class="list-group list-group-flush">
+            {% for n in notifications %}
+                <div class="list-group-item p-3 {% if not n.is_read %}bg-light border-start border-4 border-warning{% endif %}">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <span class="badge bg-dark me-2">{{ n.case_id }}</span>
+                            <strong class="fs-6 text-dark">{{ n.subject }}</strong>
+                            {% if not n.is_read %}
+                                <span class="badge bg-warning text-dark ms-2">New</span>
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">{{ n.dispatched_at|date:"M d, Y - h:i A" }}</small>
+                    </div>
+
+                    <p class="mb-2 text-secondary small">{{ n.message_body }}</p>
+
+                    <div class="d-flex justify-content-between align-items-center small text-muted">
+                        <div>
+                            <span>Recipient: <strong>{{ n.recipient_name }}</strong> ({{ n.recipient_email }})</span> &bull; 
+                            <span class="badge bg-secondary ms-1">{{ n.get_notification_channel_display }}</span> &bull; 
+                            <span class="badge bg-info text-dark ms-1">{{ n.get_event_type_display }}</span>
+                        </div>
+                        <div>
+                            {% if not n.is_read %}
+                                <a href="{% url 'mark_notification_read' notif_id=n.id %}" class="btn btn-sm btn-outline-primary py-0">
+                                    <i class="fa-solid fa-check me-1"></i> Mark Read
+                                </a>
+                            {% else %}
+                                <span class="text-success"><i class="fa-solid fa-check-double me-1"></i> Read</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="text-center py-5 text-muted">
+                    <i class="fa-solid fa-bell-slash fs-1 d-block mb-2 text-secondary"></i>
+                    No notification logs found matching the selected channel filter.
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

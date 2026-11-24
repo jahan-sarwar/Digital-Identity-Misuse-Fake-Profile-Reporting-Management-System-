@@ -1,0 +1,8 @@
+# URL configuration for Case Tracker
+from django.contrib import admin
+from django.urls import path, include
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('', include('tracking_app.urls')),
+]
