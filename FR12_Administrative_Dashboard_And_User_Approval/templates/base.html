@@ -29,9 +29,18 @@
                 <a href="{% url 'user_signup' %}" class="btn btn-sm btn-outline-info me-2">
                     <i class="fa-solid fa-user-plus me-1"></i> Register User
                 </a>
-                <a href="{% url 'user_login' %}" class="btn btn-sm btn-light">
-                    <i class="fa-solid fa-right-to-bracket me-1"></i> Login Portal
-                </a>
+                {% if request.session.username or request.user.is_authenticated %}
+                    <span class="badge bg-success me-2 py-2 px-3">
+                        <i class="fa-solid fa-user-shield me-1"></i> {{ request.session.username|default:request.user.username }}
+                    </span>
+                    <a href="{% url 'user_logout' %}" class="btn btn-sm btn-outline-danger">
+                        <i class="fa-solid fa-right-from-bracket me-1"></i> Logout
+                    </a>
+                {% else %}
+                    <a href="{% url 'user_login' %}" class="btn btn-sm btn-light">
+                        <i class="fa-solid fa-right-to-bracket me-1"></i> Login Portal
+                    </a>
+                {% endif %}
             </div>
         </div>
     </nav>

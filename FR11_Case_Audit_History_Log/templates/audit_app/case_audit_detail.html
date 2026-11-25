@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+<!-- Single Case Detailed Audit Timeline -->
+
+{% block title %}Audit Trail: {{ case_id }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card shadow-sm border-0 mb-4 border-top border-primary border-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0 fw-bold text-dark">
+                        <i class="fa-solid fa-timeline text-primary me-2"></i>Comprehensive Audit Trail: {{ case_id }}
+                    </h5>
+                    <small class="text-muted">Chronological history of all actions, actors, IP addresses, and hash verifications.</small>
+                </div>
+                <a href="{% url 'audit_dashboard' %}" class="btn btn-sm btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Audit Board
+                </a>
+            </div>
+
+            <div class="card-body p-4">
+                {% for log in logs %}
+                    <div class="border-start border-3 border-info ps-3 pb-4 mb-3 position-relative">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong class="text-dark">{{ log.get_action_category_display }}</strong>
+                            <small class="text-muted">{{ log.timestamp|date:"Y-m-d H:i:s" }}</small>
+                        </div>
+                        <div class="small text-muted mb-2">
+                            <span>Actor: <strong>{{ log.actor_username }}</strong> ({{ log.actor_role }})</span> &bull; 
+                            <span>IP: <code>{{ log.ip_address }}</code></span>
+                        </div>
+                        <p class="p-3 bg-light rounded text-secondary mb-2 small">{{ log.action_narrative }}</p>
+                        <div class="small">
+                            <span class="text-muted me-1">Cryptographic Hash Digest:</span>
+                            <code class="text-success small">{{ log.event_hash }}</code>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="text-center py-4 text-muted">No audit transactions recorded for this case reference ID.</div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

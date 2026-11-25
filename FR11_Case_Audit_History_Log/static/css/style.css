@@ -1,0 +1,27 @@
+/* Styling for Case Audit Trail System */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+}
+
+.card {
+    border-radius: 0.65rem;
+}
+
+.table th {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #64748b;
+    padding: 0.85rem 1rem;
+}
+
+.table td {
+    padding: 0.85rem 1rem;
+}
+
+.badge {
+    padding: 0.45em 0.75em;
+    font-weight: 600;
+}
