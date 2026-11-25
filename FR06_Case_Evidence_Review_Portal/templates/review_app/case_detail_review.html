@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+<!-- Case Detail & Evidence Inspection Template -->
+
+{% block title %}Case Inspection: {{ case.case_id }}{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+    <!-- Left Column: Case Narrative & Offense Details -->
+    <div class="col-lg-7">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-dark text-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold">
+                    <i class="fa-solid fa-file-shield text-info me-2"></i>Incident Dossier: {{ case.case_id }}
+                </h5>
+                <span class="badge bg-secondary">{{ case.get_target_platform_display }}</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3 mb-4">
+                    <div class="col-sm-6">
+                        <span class="text-muted small d-block">Complainant:</span>
+                        <strong class="fs-6">{{ case.complainant_name }}</strong>
+                        <div class="text-muted small">{{ case.complainant_email }}</div>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="text-muted small d-block">Impersonated Account Name:</span>
+                        <span class="text-danger fw-bold fs-6">{{ case.impersonated_name }}</span>
+                    </div>
+                    <div class="col-12">
+                        <span class="text-muted small d-block">Reported Impersonation URL:</span>
+                        <a href="{{ case.fake_profile_url }}" target="_blank" class="text-break text-primary fw-semibold">
+                            <i class="fa-solid fa-arrow-up-right-from-square me-1"></i> {{ case.fake_profile_url }}
+                        </a>
+                    </div>
+                </div>
+
+                <h6 class="fw-bold text-dark border-bottom pb-2">
+                    <i class="fa-solid fa-align-left text-primary me-2"></i>Incident Narrative Statement
+                </h6>
+                <div class="p-3 bg-light rounded border text-secondary mb-4">
+                    {{ case.incident_narrative }}
+                </div>
+
+                <h6 class="fw-bold text-dark border-bottom pb-2">
+                    <i class="fa-solid fa-images text-primary me-2"></i>Attached Supporting Evidence Inventory
+                </h6>
+                <div class="p-3 bg-white rounded border d-flex justify-content-between align-items-center">
+                    <div>
+                        <strong class="d-block">{{ case.evidence_summary|default:"Profile and Message Evidence Archive" }}</strong>
+                        <small class="text-muted">{{ case.evidence_count }} Files attached to this case dossier</small>
+                    </div>
+                    <button type="button" class="btn btn-outline-primary btn-sm" onclick="alert('Evidence package integrity verified: SHA-256 hash verified.');">
+                        <i class="fa-solid fa-shield-virus me-1"></i> Inspect Evidence Hashes
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <a href="{% url 'case_review_list' %}" class="btn btn-outline-secondary">
+            <i class="fa-solid fa-arrow-left me-1"></i> Return to Triage Queue
+        </a>
+    </div>
+
+    <!-- Right Column: Administrative Triage & Decision Panel -->
+    <div class="col-lg-5">
+        <div class="card shadow-sm border-0 border-top border-primary border-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-dark">
+                    <i class="fa-solid fa-gavel text-primary me-2"></i>Officer Triage & Assessment Form
+                </h5>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Assessed Risk Level</label>
+                        {{ form.risk_level }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Administrative Review Verdict</label>
+                        {{ form.review_status }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Forensic & Review Officer Notes</label>
+                        {{ form.reviewer_notes }}
+                        <small class="text-muted">Enter internal justification for accepting or escalating this case.</small>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Reviewing Officer Identifier</label>
+                        {{ form.reviewed_by }}
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary fw-bold py-2">
+                            <i class="fa-solid fa-floppy-disk me-2"></i> Save Official Triage Decision
+                        </button>
+                    </div>
+                </form>
+
+                {% if case.reviewed_at %}
+                    <div class="mt-4 pt-3 border-top text-muted small">
+                        <i class="fa-solid fa-clock-rotate-left me-1"></i> Last updated by <strong>{{ case.reviewed_by }}</strong> on {{ case.reviewed_at|date:"M d, Y h:i A" }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

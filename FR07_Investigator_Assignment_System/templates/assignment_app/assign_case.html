@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+<!-- Specific Case Assignment Execution View -->
+
+{% block title %}Assign Investigator: {{ case.case_id }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 border-top border-primary border-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold text-dark">
+                    <i class="fa-solid fa-user-check text-primary me-2"></i>Assign Incident to Authorized Forensic Officer
+                </h5>
+                <small class="text-muted">Allocate responsibility, set resolution deadlines, and communicate forensic instructions.</small>
+            </div>
+            <div class="card-body p-4">
+                <!-- Case Summary Header -->
+                <div class="alert alert-light border p-3 mb-4">
+                    <div class="row">
+                        <div class="col-sm-6 mb-2">
+                            <span class="text-muted small d-block">Incident Reference:</span>
+                            <strong class="text-primary fs-5">{{ case.case_id }}</strong>
+                        </div>
+                        <div class="col-sm-6 mb-2">
+                            <span class="text-muted small d-block">Platform:</span>
+                            <span class="badge bg-secondary fs-6">{{ case.platform }}</span>
+                        </div>
+                        <div class="col-12">
+                            <span class="text-muted small d-block">Incident Headline:</span>
+                            <div class="fw-semibold text-dark">{{ case.title }}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Assignment Form -->
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-12">
+                            <label class="form-label fw-bold">Select Investigating Detective / Officer <span class="text-danger">*</span></label>
+                            {{ form.assigned_investigator }}
+                            <small class="text-muted">Only officers with active capacity should be allocated urgent cases.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Operational Priority Tier <span class="text-danger">*</span></label>
+                            {{ form.priority }}
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Investigation Deadline Date</label>
+                            {{ form.deadline_date }}
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-bold">Supervisory Directives & Forensic Objectives</label>
+                            {{ form.supervisor_directives }}
+                            <small class="text-muted">Enter specific legal mandates, evidence preservation steps, or platform escalation tasks.</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold">Supervising Officer / Dispatcher</label>
+                            {{ form.assigned_by }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center mt-4 pt-3 border-top">
+                        <a href="{% url 'assignment_dashboard' %}" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-arrow-left me-1"></i> Back to Dashboard
+                        </a>
+                        <button type="submit" class="btn btn-primary fw-bold px-4">
+                            <i class="fa-solid fa-check me-2"></i> Confirm Case Allocation
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

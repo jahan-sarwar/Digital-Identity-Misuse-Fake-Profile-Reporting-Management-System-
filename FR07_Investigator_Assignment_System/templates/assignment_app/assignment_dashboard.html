@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+<!-- Investigator Assignment Board and Workload Balancer -->
+
+{% block title %}Case Allocation & Investigator Management{% endblock %}
+
+{% block content %}
+<!-- Metric Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-primary text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-white-50 small">Total Incidents in Pool</span>
+                    <h3 class="fw-bold mb-0">{{ total_cases }}</h3>
+                </div>
+                <i class="fa-solid fa-folder-tree fs-1 text-white-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-danger text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-white-50 small">Unassigned Cases</span>
+                    <h3 class="fw-bold mb-0">{{ unassigned_cases }}</h3>
+                </div>
+                <i class="fa-solid fa-triangle-exclamation fs-1 text-white-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-success text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-white-50 small">Assigned & Active</span>
+                    <h3 class="fw-bold mb-0">{{ assigned_cases }}</h3>
+                </div>
+                <i class="fa-solid fa-user-shield fs-1 text-white-50"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card shadow-sm border-0 bg-dark text-white p-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-white-50 small">Investigators on Duty</span>
+                    <h3 class="fw-bold mb-0">{{ total_investigators }}</h3>
+                </div>
+                <i class="fa-solid fa-user-group fs-1 text-white-50"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Case Assignment Queue -->
+    <div class="col-lg-8">
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h5 class="mb-0 fw-bold text-dark">
+                    <i class="fa-solid fa-list-check text-primary me-2"></i>Incident Allocation Queue
+                </h5>
+                <div class="btn-group btn-group-sm">
+                    <a href="{% url 'assignment_dashboard' %}" class="btn btn-outline-secondary {% if selected_status == 'ALL' %}active{% endif %}">All Cases</a>
+                    <a href="{% url 'assignment_dashboard' %}?status=UNASSIGNED" class="btn btn-outline-danger {% if selected_status == 'UNASSIGNED' %}active{% endif %}">Unassigned</a>
+                    <a href="{% url 'assignment_dashboard' %}?status=ASSIGNED" class="btn btn-outline-success {% if selected_status == 'ASSIGNED' %}active{% endif %}">Assigned</a>
+                </div>
+            </div>
+
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Case ID</th>
+                                <th>Incident Headline</th>
+                                <th>Platform</th>
+                                <th>Urgency</th>
+                                <th>Assigned Detective</th>
+                                <th>Status</th>
+                                <th class="text-end">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in assignments %}
+                                <tr>
+                                    <td><strong class="text-primary">{{ c.case_id }}</strong></td>
+                                    <td>
+                                        <div class="fw-semibold">{{ c.title }}</div>
+                                        <small class="text-muted">Logged: {{ c.created_at|date:"M d, Y" }}</small>
+                                    </td>
+                                    <td><span class="badge bg-secondary">{{ c.platform }}</span></td>
+                                    <td>
+                                        {% if c.priority == 'URGENT' %}
+                                            <span class="badge bg-danger">Urgent (6h)</span>
+                                        {% elif c.priority == 'HIGH' %}
+                                            <span class="badge bg-warning text-dark">High (24h)</span>
+                                        {% elif c.priority == 'MEDIUM' %}
+                                            <span class="badge bg-info text-dark">Medium (72h)</span>
+                                        {% else %}
+                                            <span class="badge bg-light text-dark border">Low (7d)</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if c.assigned_investigator %}
+                                            <div class="fw-semibold text-dark">{{ c.assigned_investigator.full_name }}</div>
+                                            <small class="text-muted">{{ c.assigned_investigator.badge_number }}</small>
+                                        {% else %}
+                                            <span class="text-danger fw-bold"><i class="fa-solid fa-clock-rotate-left me-1"></i> Awaiting Assignment</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if c.assignment_status == 'ASSIGNED' %}
+                                            <span class="badge bg-success">Assigned</span>
+                                        {% elif c.assignment_status == 'UNASSIGNED' %}
+                                            <span class="badge bg-danger">Unassigned</span>
+                                        {% else %}
+                                            <span class="badge bg-primary">{{ c.get_assignment_status_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-end">
+                                        <a href="{% url 'assign_case' case_id=c.case_id %}" class="btn btn-sm btn-primary">
+                                            <i class="fa-solid fa-user-plus me-1"></i> Assign
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">No cases in the allocation queue.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Investigator Staff Directory & Workload Balancer -->
+    <div class="col-lg-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white py-3">
+                <h6 class="mb-0 fw-bold">
+                    <i class="fa-solid fa-user-gear text-info me-2"></i>Investigator Caseload Roster
+                </h6>
+            </div>
+            <div class="card-body p-3">
+                {% for inv in investigators %}
+                    <div class="p-3 border rounded mb-3 bg-white">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <strong class="text-dark">{{ inv.full_name }}</strong>
+                            {% if inv.is_available %}
+                                <span class="badge bg-success">Available</span>
+                            {% else %}
+                                <span class="badge bg-danger">At Capacity</span>
+                            {% endif %}
+                        </div>
+                        <div class="text-muted small mb-2">
+                            <span><i class="fa-solid fa-id-badge text-primary me-1"></i> {{ inv.badge_number }}</span> &bull; 
+                            <span>{{ inv.get_specialization_display }}</span>
+                        </div>
+                        <!-- Caseload progress bar -->
+                        <div class="small fw-semibold d-flex justify-content-between mb-1">
+                            <span>Active Caseload:</span>
+                            <span>{{ inv.active_caseload }} / {{ inv.max_caseload_capacity }} Cases</span>
+                        </div>
+                        <div class="progress" style="height: 6px;">
+                            <div class="progress-bar {% if inv.active_caseload >= inv.max_caseload_capacity %}bg-danger{% else %}bg-primary{% endif %}" 
+                                 role="progressbar" 
+                                 style="width: {% widthratio inv.active_caseload inv.max_caseload_capacity 100 %}%;">
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted small">No investigator staff registered.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
