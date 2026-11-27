@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Create Account{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-lg-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white p-4">
+                <h4 class="mb-1 fw-bold"><i class="fa-solid fa-user-plus text-info me-2"></i>Register System Account</h4>
+                <small class="text-white-50">New accounts require Security Administrator approval prior to login.</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger small">{{ form.non_field_errors.0 }}</div>
+                    {% endif %}
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Username <span class="text-danger">*</span></label>
+                            {{ form.username }}
+                            {% if form.username.errors %}<div class="text-danger small">{{ form.username.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Full Name <span class="text-danger">*</span></label>
+                            {{ form.full_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="text-danger small">{{ form.email.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Phone Number <span class="text-danger">*</span></label>
+                            {{ form.phone_number }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Requested Role <span class="text-danger">*</span></label>
+                            {{ form.requested_role }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Password <span class="text-danger">*</span></label>
+                            {{ form.password }}
+                            {% if form.password.errors %}<div class="text-danger small">{{ form.password.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Confirm Password <span class="text-danger">*</span></label>
+                            {{ form.confirm_password }}
+                        </div>
+                    </div>
+                    <div class="d-grid mt-4">
+                        <button type="submit" class="btn btn-indigo btn-lg">Submit Registration for Approval</button>
+                    </div>
+                </form>
+                <div class="text-center mt-3 small text-muted">
+                    Already approved? <a href="{% url 'login' %}" class="fw-bold text-primary">Sign In Here</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

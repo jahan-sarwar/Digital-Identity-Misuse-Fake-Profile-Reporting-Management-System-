@@ -1,0 +1,250 @@
+{% extends 'base.html' %}
+{% block title %}Case {{ case.case_id }}{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <div>
+        <h4 class="fw-bold mb-0">
+            <span class="text-primary">{{ case.case_id }}</span> — {{ case.title }}
+        </h4>
+        <small class="text-muted">
+            Platform: <strong>{{ case.get_platform_display }}</strong> &bull;
+            Tracking PIN: <code>{{ case.security_pin }}</code> &bull;
+            Progress: <strong>{{ case.percentage_progress }}%</strong>
+        </small>
+    </div>
+    <span class="badge bg-dark fs-6">{{ case.get_current_status_display }}</span>
+</div>
+
+<!-- Progress Bar -->
+<div class="progress mb-4" style="height: 10px;">
+    <div class="progress-bar bg-primary progress-bar-striped" style="width: {{ case.percentage_progress }}%;"></div>
+</div>
+
+<div class="row g-4">
+    <!-- Left Column: Case Details, Evidence Gallery, Identity Verification & Journal -->
+    <div class="col-lg-7">
+        <!-- Dossier Card -->
+        <div class="card mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-file-lines text-primary me-2"></i>Incident Dossier</h6>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-3 mb-3 small">
+                    <div class="col-sm-6"><strong>Complainant:</strong> {{ case.reporter_name }} ({{ case.reporter_email }})</div>
+                    <div class="col-sm-6"><strong>Date Noticed:</strong> {{ case.date_noticed }}</div>
+                    <div class="col-12">
+                        <strong>Reported Profile URL:</strong>
+                        <a href="{{ case.target_profile_url }}" target="_blank" class="text-break">{{ case.target_profile_url }}</a>
+                    </div>
+                </div>
+                <div class="p-3 bg-light rounded border small text-secondary mb-2">{{ case.incident_description }}</div>
+                {% if case.impact_summary %}
+                    <div class="small text-muted"><strong>Impact:</strong> {{ case.impact_summary }}</div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Evidence Upload & Gallery -->
+        <div class="card mb-4">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-images text-primary me-2"></i>Supporting Evidence ({{ evidences.count }})</h6>
+            </div>
+            <div class="card-body p-4">
+                <div class="row g-2 mb-4">
+                    {% for ev in evidences %}
+                        <div class="col-md-6">
+                            <div class="p-2 border rounded d-flex justify-content-between align-items-center bg-light">
+                                <div class="small">
+                                    <strong class="d-block">{{ ev.get_file_type_display }}</strong>
+                                    <span class="text-muted">{{ ev.caption|default:"Evidence File"|truncatechars:28 }}</span>
+                                </div>
+                                <a href="{{ ev.file.url }}" target="_blank" class="btn btn-sm btn-outline-primary">View</a>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted small mb-0">No evidence files uploaded yet.</p>
+                    {% endfor %}
+                </div>
+
+                <form method="POST" enctype="multipart/form-data" class="border-top pt-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="action_type" value="UPLOAD_EVIDENCE">
+                    <div class="row g-2 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-bold">Type</label>
+                            {{ evidence_form.file_type }}
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label small fw-bold">File (JPG/PNG/PDF, Max 5MB)</label>
+                            {{ evidence_form.file }}
+                        </div>
+                        <div class="col-md-3 d-grid">
+                            <button type="submit" class="btn btn-dark btn-sm py-2">Upload</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Identity Verification Workflow -->
+        <div class="card mb-4">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-id-badge text-primary me-2"></i>Complainant Identity Verification</h6>
+            </div>
+            <div class="card-body p-4">
+                {% for v in verifications %}
+                    <div class="p-3 border rounded mb-3 bg-light d-flex flex-wrap justify-content-between align-items-center gap-2">
+                        <div class="small">
+                            <strong>{{ v.reporter_full_name }}</strong> &bull; {{ v.get_document_type_display }} (<code>{{ v.id_number }}</code>)
+                            <div class="mt-1">
+                                <a href="{{ v.document_file.url }}" target="_blank" class="me-2">ID Scan</a>
+                                <a href="{{ v.selfie_photo.url }}" target="_blank">Selfie</a>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge {% if v.verification_status == 'VERIFIED' %}bg-success{% elif v.verification_status == 'REJECTED' %}bg-danger{% else %}bg-warning text-dark{% endif %}">
+                                {{ v.get_verification_status_display }}
+                            </span>
+                            {% if user_role == 'ADMIN' and v.verification_status == 'PENDING' %}
+                                <form method="POST" class="d-inline">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action_type" value="VERIFY_DECISION">
+                                    <input type="hidden" name="verification_id" value="{{ v.id }}">
+                                    <button type="submit" name="decision" value="APPROVE" class="btn btn-sm btn-success">Verify</button>
+                                    <button type="submit" name="decision" value="REJECT" class="btn btn-sm btn-danger">Reject</button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted small">No identity verification documents submitted for this case yet.</p>
+                {% endfor %}
+
+                <form method="POST" enctype="multipart/form-data" class="border-top pt-3">
+                    {% csrf_token %}
+                    <input type="hidden" name="action_type" value="SUBMIT_VERIFICATION">
+                    <div class="row g-2">
+                        <div class="col-md-4">{{ verify_form.reporter_full_name }}</div>
+                        <div class="col-md-4">{{ verify_form.document_type }}</div>
+                        <div class="col-md-4">{{ verify_form.id_number }}</div>
+                        <div class="col-md-5"><label class="small text-muted">ID Document</label>{{ verify_form.document_file }}</div>
+                        <div class="col-md-5"><label class="small text-muted">Selfie Photo</label>{{ verify_form.selfie_photo }}</div>
+                        <div class="col-md-2 d-grid align-items-end"><button type="submit" class="btn btn-primary btn-sm py-2">Submit ID</button></div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Investigation Notes Timeline -->
+        <div class="card">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-timeline text-primary me-2"></i>Investigation Activity Journal</h6>
+            </div>
+            <div class="card-body p-4">
+                {% if is_staff_role %}
+                <form method="POST" class="mb-4 pb-3 border-bottom">
+                    {% csrf_token %}
+                    <input type="hidden" name="action_type" value="ADD_NOTE">
+                    <div class="row g-2 mb-2">
+                        <div class="col-md-7">{{ note_form.note_type }}</div>
+                        <div class="col-md-5 d-flex align-items-center">
+                            <div class="form-check">
+                                {{ note_form.is_confidential }}
+                                <label class="form-check-label small text-danger fw-semibold">Confidential Note</label>
+                            </div>
+                        </div>
+                    </div>
+                    {{ note_form.detailed_notes }}
+                    <div class="text-end mt-2">
+                        <button type="submit" class="btn btn-dark btn-sm">Append Note</button>
+                    </div>
+                </form>
+                {% endif %}
+
+                {% for n in notes %}
+                    <div class="border-start border-3 border-primary ps-3 mb-3">
+                        <div class="d-flex justify-content-between small">
+                            <strong>{{ n.officer_name }}</strong>
+                            <span class="text-muted">{{ n.created_at|date:"M d, Y h:i A" }}</span>
+                        </div>
+                        <span class="badge bg-secondary mb-1">{{ n.get_note_type_display }}</span>
+                        {% if n.is_confidential %}<span class="badge bg-danger mb-1">Confidential</span>{% endif %}
+                        <p class="small text-secondary mb-0">{{ n.detailed_notes }}</p>
+                    </div>
+                {% empty %}
+                    <p class="text-muted small mb-0">No activity notes recorded yet.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Admin Triage, Investigator Assignment & Investigation Progress -->
+    <div class="col-lg-5">
+        {% if user_role == 'ADMIN' %}
+        <!-- Admin Triage & Evidence Review -->
+        <div class="card mb-4 border-top border-4 border-primary">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-gavel text-primary me-2"></i>Administrator Triage &amp; Risk Assessment</h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action_type" value="SAVE_TRIAGE">
+                    <div class="mb-2"><label class="form-label small fw-bold">Risk Level</label>{{ triage_form.risk_level }}</div>
+                    <div class="mb-2"><label class="form-label small fw-bold">Case Status</label>{{ triage_form.current_status }}</div>
+                    <div class="mb-2"><label class="form-label small fw-bold">Internal Triage Notes</label>{{ triage_form.reviewer_notes }}</div>
+                    <div class="mb-3"><label class="form-label small fw-bold">Public Status Message</label>{{ triage_form.public_status_message }}</div>
+                    <button type="submit" class="btn btn-indigo w-100">Save Triage Decision</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Investigator Assignment -->
+        <div class="card mb-4 border-top border-4 border-info">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-user-plus text-info me-2"></i>Assign Forensic Investigator</h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action_type" value="ASSIGN_INVESTIGATOR">
+                    <div class="mb-2"><label class="form-label small fw-bold">Investigator</label>{{ assign_form.assigned_investigator }}</div>
+                    <div class="row g-2 mb-2">
+                        <div class="col-6"><label class="form-label small fw-bold">Priority</label>{{ assign_form.priority }}</div>
+                        <div class="col-6"><label class="form-label small fw-bold">Deadline</label>{{ assign_form.deadline_date }}</div>
+                    </div>
+                    <div class="mb-3"><label class="form-label small fw-bold">Directives</label>{{ assign_form.supervisor_directives }}</div>
+                    <button type="submit" class="btn btn-info text-dark fw-bold w-100">Confirm Case Assignment</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if is_staff_role %}
+        <!-- Investigator Progress & Takedown Update -->
+        <div class="card border-top border-4 border-success">
+            <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-sliders text-success me-2"></i>Investigation &amp; Takedown Controls</h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="action_type" value="UPDATE_INVESTIGATION">
+                    <div class="mb-2"><label class="form-label small fw-bold">Milestone Status</label>{{ progress_form.current_status }}</div>
+                    <div class="mb-2"><label class="form-label small fw-bold">Suspect Forensic Leads</label>{{ progress_form.suspect_lead_info }}</div>
+                    <div class="form-check form-switch mb-2">
+                        {{ progress_form.platform_takedown_requested }}
+                        <label class="form-check-label small fw-bold">Platform Takedown Issued</label>
+                    </div>
+                    <div class="mb-2"><label class="form-label small fw-bold">Platform Ticket Reference</label>{{ progress_form.platform_ticket_id }}</div>
+                    <div class="mb-2"><label class="form-label small fw-bold">Public Status Update</label>{{ progress_form.public_status_message }}</div>
+                    <div class="mb-3"><label class="form-label small fw-bold">Estimated Resolution Date</label>{{ progress_form.estimated_completion_date }}</div>
+                    <button type="submit" class="btn btn-success w-100 fw-bold">Update Investigation Status</button>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

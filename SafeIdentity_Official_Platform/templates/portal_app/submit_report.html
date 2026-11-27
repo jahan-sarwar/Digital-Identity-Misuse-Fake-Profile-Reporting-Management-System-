@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block title %}Submit Incident Report{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+        <div class="card">
+            <div class="card-header bg-dark text-white p-4">
+                <h4 class="mb-1 fw-bold"><i class="fa-solid fa-file-circle-plus text-info me-2"></i>File Fake Profile &amp; Identity Misuse Report</h4>
+                <small class="text-white-50">Provide the offending profile URL, detailed incident narrative, and optional supporting evidence.</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">1. Complainant Contact Details</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Your Full Name <span class="text-danger">*</span></label>
+                            {{ form.reporter_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Notification Email <span class="text-danger">*</span></label>
+                            {{ form.reporter_email }}
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">2. Offending Platform &amp; Profile Link</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Social Media Platform <span class="text-danger">*</span></label>
+                            {{ form.platform }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Other Platform (if applicable)</label>
+                            {{ form.other_platform_name }}
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-semibold">Reported Profile URL <span class="text-danger">*</span></label>
+                            {{ form.target_profile_url }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Username / Handle</label>
+                            {{ form.target_username_or_handle }}
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">3. Incident Description &amp; Impact</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Incident Category <span class="text-danger">*</span></label>
+                            {{ form.incident_type }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-semibold">Date First Noticed <span class="text-danger">*</span></label>
+                            {{ form.date_noticed }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Incident Headline <span class="text-danger">*</span></label>
+                            {{ form.title }}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Detailed Narrative <span class="text-danger">*</span></label>
+                            {{ form.incident_description }}
+                            {% if form.incident_description.errors %}<div class="text-danger small">{{ form.incident_description.errors.0 }}</div>{% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Impact Summary</label>
+                            {{ form.impact_summary }}
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">4. Attach Initial Evidence (Optional — Can Add More Later)</h6>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Evidence Type</label>
+                            {{ evidence_form.file_type }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Upload File (JPG/PNG/PDF, Max 5MB)</label>
+                            {{ evidence_form.file }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Caption</label>
+                            {{ evidence_form.caption }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                        <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-indigo btn-lg px-4">
+                            <i class="fa-solid fa-paper-plane me-2"></i> Submit Official Report
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

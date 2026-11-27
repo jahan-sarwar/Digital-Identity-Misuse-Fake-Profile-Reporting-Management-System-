@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% block title %}Case Directory{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4 class="fw-bold mb-0">Incident Case Directory</h4>
+    <a href="{% url 'submit_report' %}" class="btn btn-indigo btn-sm"><i class="fa-solid fa-plus me-1"></i> File New Report</a>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body p-3">
+        <form method="GET" class="row g-2 align-items-center">
+            <div class="col-md-4">
+                <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search Case ID, Headline, or Name...">
+            </div>
+            <div class="col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    <option value="SUBMITTED" {% if status_f == 'SUBMITTED' %}selected{% endif %}>Submitted</option>
+                    <option value="IDENTITY_VERIFIED" {% if status_f == 'IDENTITY_VERIFIED' %}selected{% endif %}>Identity Verified</option>
+                    <option value="EVIDENCE_ACCEPTED" {% if status_f == 'EVIDENCE_ACCEPTED' %}selected{% endif %}>Evidence Validated</option>
+                    <option value="ASSIGNED" {% if status_f == 'ASSIGNED' %}selected{% endif %}>Assigned</option>
+                    <option value="IN_PROGRESS" {% if status_f == 'IN_PROGRESS' %}selected{% endif %}>In Progress</option>
+                    <option value="LEGAL_NOTICE_SENT" {% if status_f == 'LEGAL_NOTICE_SENT' %}selected{% endif %}>Takedown Issued</option>
+                    <option value="RESOLVED" {% if status_f == 'RESOLVED' %}selected{% endif %}>Resolved</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <select name="risk" class="form-select">
+                    <option value="">All Risk Levels</option>
+                    <option value="CRITICAL" {% if risk_f == 'CRITICAL' %}selected{% endif %}>Critical</option>
+                    <option value="HIGH" {% if risk_f == 'HIGH' %}selected{% endif %}>High</option>
+                    <option value="MEDIUM" {% if risk_f == 'MEDIUM' %}selected{% endif %}>Medium</option>
+                    <option value="LOW" {% if risk_f == 'LOW' %}selected{% endif %}>Low</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button type="submit" class="btn btn-dark"><i class="fa-solid fa-filter me-1"></i> Filter</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr>
+                        <th>Case ID</th>
+                        <th>Platform &amp; Title</th>
+                        <th>Complainant</th>
+                        <th>Investigator</th>
+                        <th>Risk</th>
+                        <th>Status</th>
+                        <th class="text-end">Manage</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in cases %}
+                    <tr>
+                        <td><strong class="text-primary">{{ c.case_id }}</strong></td>
+                        <td>
+                            <div class="fw-semibold">{{ c.title }}</div>
+                            <span class="badge bg-secondary">{{ c.get_platform_display }}</span>
+                        </td>
+                        <td>{{ c.reporter_name }}</td>
+                        <td>
+                            {% if c.assigned_investigator %}
+                                <span class="badge bg-light text-dark border">{{ c.assigned_investigator.first_name|default:c.assigned_investigator.username }}</span>
+                            {% else %}
+                                <span class="text-muted small">Unassigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <span class="badge {% if c.risk_level == 'CRITICAL' %}bg-danger{% elif c.risk_level == 'HIGH' %}bg-warning text-dark{% else %}bg-info text-dark{% endif %}">
+                                {{ c.get_risk_level_display }}
+                            </span>
+                        </td>
+                        <td><span class="badge bg-dark">{{ c.get_current_status_display }}</span></td>
+                        <td class="text-end">
+                            <a href="{% url 'case_detail' case_id=c.case_id %}" class="btn btn-sm btn-indigo">Inspect Case</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" class="text-center py-4 text-muted">No matching cases found.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

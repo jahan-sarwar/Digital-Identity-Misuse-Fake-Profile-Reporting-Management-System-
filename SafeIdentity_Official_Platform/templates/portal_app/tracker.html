@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% block title %}Public Case Tracker{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header bg-dark text-white p-4">
+                <h4 class="mb-1 fw-bold"><i class="fa-solid fa-satellite-dish text-info me-2"></i>Live Case Status Tracker</h4>
+                <small class="text-white-50">Enter your Case Reference ID and 6-digit Security PIN to monitor real-time progress.</small>
+            </div>
+            <div class="card-body p-4">
+                <form method="GET" class="row g-3">
+                    <div class="col-md-7">
+                        <label class="form-label fw-semibold">Case Reference ID</label>
+                        <input type="text" name="case_id" value="{{ case_id_q }}" class="form-control form-control-lg text-uppercase" placeholder="e.g. DIM-2026-..." required>
+                    </div>
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold">Security PIN (Optional)</label>
+                        <input type="password" name="pin" value="{{ pin_q }}" class="form-control form-control-lg" placeholder="6-digit PIN">
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-indigo btn-lg px-4">Track Case</button>
+                    </div>
+                </form>
+                {% if sample_cases %}
+                <div class="mt-3 pt-3 border-top small text-muted">
+                    Demo Cases:
+                    {% for sc in sample_cases %}
+                        <a href="?case_id={{ sc.case_id }}&pin={{ sc.security_pin }}" class="badge bg-light text-primary border text-decoration-none me-1">
+                            {{ sc.case_id }} (PIN: {{ sc.security_pin }})
+                        </a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if case %}
+        <div class="card border-top border-4 border-success">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0 fw-bold">{{ case.case_id }} — {{ case.title }}</h5>
+                    <small class="text-muted">Platform: {{ case.get_platform_display }}</small>
+                </div>
+                <span class="badge bg-success fs-6">{{ case.get_current_status_display }}</span>
+            </div>
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between small fw-bold mb-1">
+                    <span>Investigation Completion</span>
+                    <span class="text-primary">{{ case.percentage_progress }}%</span>
+                </div>
+                <div class="progress mb-4" style="height: 12px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" style="width: {{ case.percentage_progress }}%;"></div>
+                </div>
+
+                <div class="alert alert-primary border-0 mb-3">
+                    <strong><i class="fa-solid fa-bullhorn me-2"></i>Official Status Update:</strong><br>
+                    {{ case.public_status_message }}
+                </div>
+
+                <div class="row g-3 small bg-light p-3 rounded border">
+                    <div class="col-sm-4"><strong>Complainant:</strong> {{ case.reporter_name }}</div>
+                    <div class="col-sm-4"><strong>Filed On:</strong> {{ case.created_at|date:"M d, Y" }}</div>
+                    <div class="col-sm-4"><strong>Est. Completion:</strong> {{ case.estimated_completion_date|default:"Under Review" }}</div>
+                </div>
+            </div>
+        </div>
+        {% elif searched %}
+        <div class="card p-5 text-center text-muted">
+            <i class="fa-solid fa-circle-question fs-1 text-warning mb-2"></i>
+            <h5>Case Not Found</h5>
+            <p class="mb-0 small">Double-check your Case ID and 6-digit Security PIN.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

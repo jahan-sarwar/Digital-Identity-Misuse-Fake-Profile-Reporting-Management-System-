@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block title %}Sign In — SafeIdentity Portal{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center py-4">
+    <div class="col-lg-6 col-md-8">
+
+        <!-- Role Selection Tabs -->
+        <div class="card shadow-sm border-0 overflow-hidden mb-3">
+            <div class="bg-light p-2 border-bottom">
+                <ul class="nav nav-pills nav-fill gap-2" id="loginRoleTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link py-3 fw-bold {% if active_tab != 'admin' %}active bg-primary text-white shadow-sm{% else %}text-secondary{% endif %}" 
+                                id="tab-user" 
+                                type="button" 
+                                onclick="switchRole('user')">
+                            <i class="fa-solid fa-user me-2"></i> Citizen / General User
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link py-3 fw-bold {% if active_tab == 'admin' %}active bg-dark text-white shadow-sm{% else %}text-secondary{% endif %}" 
+                                id="tab-admin" 
+                                type="button" 
+                                onclick="switchRole('admin')">
+                            <i class="fa-solid fa-shield-halved text-warning me-2"></i> System Administrator
+                        </button>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Citizen Portal Header -->
+            <div id="header-user" class="card-header p-4 text-white" style="background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); {% if active_tab == 'admin' %}display: none;{% endif %}">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="badge bg-white text-primary fw-bold text-uppercase px-2 py-1 mb-2">Complainant Access</span>
+                        <h4 class="mb-1 fw-bold"><i class="fa-solid fa-circle-user me-2"></i>Citizen & Public Portal Sign In</h4>
+                        <p class="small text-white-50 mb-0">Sign in to lodge fake-profile reports, upload evidence files, and view case status updates.</p>
+                    </div>
+                    <div class="display-6 text-white-50 d-none d-sm-block">
+                        <i class="fa-solid fa-users-viewfinder"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Admin Portal Header -->
+            <div id="header-admin" class="card-header p-4 text-white" style="background: linear-gradient(135deg, #0b1120 0%, #1e1b4b 100%); {% if active_tab != 'admin' %}display: none;{% endif %}">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <span class="badge bg-warning text-dark fw-bold text-uppercase px-2 py-1 mb-2">Restricted Access</span>
+                        <h4 class="mb-1 fw-bold text-warning"><i class="fa-solid fa-user-shield me-2"></i>Administrator Command Login</h4>
+                        <p class="small text-white-50 mb-0">High-security command sign-in for Incident Review, Investigator Assignment, and Governance.</p>
+                    </div>
+                    <div class="display-6 text-warning d-none d-sm-block opacity-75">
+                        <i class="fa-solid fa-fingerprint"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Login Form Body -->
+            <div class="card-body p-4 p-lg-5">
+                <form method="POST" id="loginForm">
+                    {% csrf_token %}
+                    <input type="hidden" name="login_role" id="login_role_input" value="{{ active_tab|default:'user' }}">
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-secondary small text-uppercase" style="letter-spacing: 0.05em;">
+                            <i class="fa-solid fa-at me-1 text-primary"></i> Username or Email
+                        </label>
+                        {{ form.username }}
+                    </div>
+
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <label class="form-label fw-bold text-secondary small text-uppercase mb-0" style="letter-spacing: 0.05em;">
+                                <i class="fa-solid fa-key me-1 text-primary"></i> Password
+                            </label>
+                        </div>
+                        <div class="mt-1">
+                            {{ form.password }}
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="d-grid mb-3">
+                        <button type="submit" id="submitBtn" class="btn btn-lg fw-bold shadow-sm {% if active_tab == 'admin' %}btn-dark{% else %}btn-primary{% endif %}">
+                            <span id="submitBtnText">
+                                {% if active_tab == 'admin' %}
+                                    <i class="fa-solid fa-lock-open me-2 text-warning"></i> Sign In to Admin Console
+                                {% else %}
+                                    <i class="fa-solid fa-right-to-bracket me-2"></i> Sign In as Citizen
+                                {% endif %}
+                            </span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Citizen Switch Footer -->
+                <div id="footer-user" class="text-center pt-3 border-top" {% if active_tab == 'admin' %}style="display: none;"{% endif %}>
+                    <p class="text-muted small mb-2">Don't have a SafeIdentity account yet?</p>
+                    <a href="{% url 'register' %}" class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-semibold">
+                        <i class="fa-solid fa-user-plus me-1"></i> Register New Citizen Account
+                    </a>
+                </div>
+
+                <!-- Admin Credentials Info Card -->
+                <div id="footer-admin" class="pt-3 border-top" {% if active_tab != 'admin' %}style="display: none;"{% endif %}>
+                    <div class="alert alert-dark border-0 rounded-3 p-3 mb-0 small text-light" style="background: #111827;">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <i class="fa-solid fa-key text-warning"></i>
+                            <span class="fw-bold text-warning text-uppercase" style="font-size: 0.75rem; letter-spacing: 0.05em;">System Master Admin Credentials</span>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-sm-6">
+                                <div class="bg-black bg-opacity-50 p-2 rounded border border-secondary border-opacity-25">
+                                    <span class="text-secondary d-block" style="font-size: 0.7rem;">Primary Admin</span>
+                                    <code class="text-info fw-bold">admin</code> / <code class="text-warning">Admin@1234</code>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="bg-black bg-opacity-50 p-2 rounded border border-secondary border-opacity-25">
+                                    <span class="text-secondary d-block" style="font-size: 0.7rem;">Personalized Alias</span>
+                                    <code class="text-info fw-bold">admin.sarwar</code> / <code class="text-warning">Admin@1234</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="text-white-50 mt-2" style="font-size: 0.72rem;">
+                            <i class="fa-solid fa-shield-check text-success me-1"></i> Pre-configured Super Administrator account.
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function switchRole(role) {
+    document.getElementById('login_role_input').value = role;
+    
+    const tabUser = document.getElementById('tab-user');
+    const tabAdmin = document.getElementById('tab-admin');
+    const headerUser = document.getElementById('header-user');
+    const headerAdmin = document.getElementById('header-admin');
+    const footerUser = document.getElementById('footer-user');
+    const footerAdmin = document.getElementById('footer-admin');
+    const submitBtn = document.getElementById('submitBtn');
+    const submitBtnText = document.getElementById('submitBtnText');
+
+    if (role === 'admin') {
+        tabAdmin.className = 'nav-link py-3 fw-bold active bg-dark text-white shadow-sm';
+        tabUser.className = 'nav-link py-3 fw-bold text-secondary';
+        headerAdmin.style.display = 'block';
+        headerUser.style.display = 'none';
+        footerAdmin.style.display = 'block';
+        footerUser.style.display = 'none';
+        submitBtn.className = 'btn btn-lg fw-bold shadow-sm btn-dark';
+        submitBtnText.innerHTML = '<i class="fa-solid fa-lock-open me-2 text-warning"></i> Sign In to Admin Console';
+    } else {
+        tabUser.className = 'nav-link py-3 fw-bold active bg-primary text-white shadow-sm';
+        tabAdmin.className = 'nav-link py-3 fw-bold text-secondary';
+        headerUser.style.display = 'block';
+        headerAdmin.style.display = 'none';
+        footerUser.style.display = 'block';
+        footerAdmin.style.display = 'none';
+        submitBtn.className = 'btn btn-lg fw-bold shadow-sm btn-primary';
+        submitBtnText.innerHTML = '<i class="fa-solid fa-right-to-bracket me-2"></i> Sign In as Citizen';
+    }
+}
+</script>
+{% endblock %}

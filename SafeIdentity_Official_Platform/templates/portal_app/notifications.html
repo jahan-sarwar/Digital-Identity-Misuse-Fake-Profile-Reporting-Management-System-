@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
+    <h4 class="fw-bold mb-0"><i class="fa-solid fa-bell text-warning me-2"></i>Case Notification Center</h4>
+    <div class="btn-group btn-group-sm">
+        <a href="{% url 'notifications' %}" class="btn btn-outline-secondary {% if not channel_f %}active{% endif %}">All</a>
+        <a href="?channel=IN_APP" class="btn btn-outline-primary {% if channel_f == 'IN_APP' %}active{% endif %}">In-App</a>
+        <a href="?channel=EMAIL" class="btn btn-outline-info {% if channel_f == 'EMAIL' %}active{% endif %}">Email</a>
+        <a href="?channel=SMS" class="btn btn-outline-success {% if channel_f == 'SMS' %}active{% endif %}">SMS</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="list-group list-group-flush">
+        {% for a in alerts %}
+            <div class="list-group-item p-3 {% if not a.is_read %}bg-light border-start border-4 border-warning{% endif %}">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <span class="badge bg-secondary me-1">{{ a.get_channel_display }}</span>
+                        <strong class="text-dark">{{ a.subject }}</strong>
+                        {% if not a.is_read %}<span class="badge bg-warning text-dark ms-1">New</span>{% endif %}
+                    </div>
+                    <small class="text-muted">{{ a.dispatched_at|date:"M d, Y h:i A" }}</small>
+                </div>
+                <p class="small text-secondary my-2">{{ a.message_body }}</p>
+                <div class="d-flex justify-content-between align-items-center small">
+                    <span class="text-muted">Recipient: {{ a.recipient_email|default:"System User" }}</span>
+                    {% if not a.is_read %}
+                        <a href="{% url 'mark_notification_read' notif_id=a.id %}" class="btn btn-sm btn-outline-primary py-0">Mark Read</a>
+                    {% else %}
+                        <span class="text-success"><i class="fa-solid fa-check-double"></i> Read</span>
+                    {% endif %}
+                </div>
+            </div>
+        {% empty %}
+            <div class="p-5 text-center text-muted">No notifications available.</div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
